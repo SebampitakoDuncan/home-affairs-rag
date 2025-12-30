@@ -1,0 +1,193 @@
+/* Linear/AI SDK Inspired Minimalistic Styling */
+
+/* Smooth transitions for entire app */
+.stApp {
+    transition: all 0.3s ease;
+}
+
+/* Chat message styling */
+.chat-message {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    background: #1F2937;
+    border: 1px solid #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message.user {
+    background: #374151;
+    margin-left: auto;
+    max-width: 70%;
+}
+
+.chat-message.assistant {
+    background: #1F2937;
+    margin-right: auto;
+    max-width: 80%;
+}
+
+/* Citation styling */
+.citation {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    margin: 0.25rem;
+    background: #5E6AD2;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #F9FAFB;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.citation:hover {
+    background: #4C51A8;
+    transform: translateY(-1px);
+    text-decoration: underline;
+    box-shadow: 0 2px 8px rgba(94, 106, 210, 0.3);
+}
+
+/* Upload zone styling */
+.upload-zone {
+    border: 2px dashed #374151;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #1F2937;
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    border-color: #5E6AD2;
+    background: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(94, 106, 210, 0.2);
+}
+
+/* Input field styling */
+.stTextInput > div > div > input,
+.stTextInput > div > div > textarea {
+    background: #1F2937;
+    border: 1px solid #374151;
+    color: #F9FAFB;
+    border-radius: 0.375rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextInput > div > div > textarea:focus {
+    border-color: #5E6AD2;
+    box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.1);
+    outline: none;
+}
+
+/* Button styling */
+.stButton > button {
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* Confidence score */
+.confidence-score {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid #10B981;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    color: #10B981;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Loading animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Modal styling */
+.modal-container {
+    background: #1F2937;
+    border: 1px solid #374151;
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    padding: 2rem;
+}
+
+/* Source document preview */
+.source-preview {
+    background: #1F2937;
+    border: 1px solid #374151;
+    border-radius: 0.375rem;
+    padding: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #374151;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5E6AD2;
+}
+
+/* Success/error indicators */
+.status-success {
+    color: #10B981;
+    font-weight: 600;
+}
+
+.status-error {
+    color: #EF4444;
+    font-weight: 600;
+}
+
+/* Header styling */
+.app-header {
+    background: linear-gradient(180deg, #1F2937 0%, #0A0A0A 100%);
+    border-bottom: 1px solid #374151;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #F9FAFB;
+    font-family: 'Inter', sans-serif;
+}

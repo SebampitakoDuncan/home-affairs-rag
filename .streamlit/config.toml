@@ -1,0 +1,18 @@
+[theme]
+primaryColor = "#5E6AD2"
+backgroundColor = "#0A0A0A"
+secondaryBackgroundColor = "#1F2937"
+textColor = "#F9FAFB"
+font = "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+
+[logger]
+level = "info"
+
+[client]
+showErrorDetails = true
+maxUploadSize = 200
+
+[server]
+maxUploadSize = 200
+enableCORS = false
+enableXsrfProtection = true

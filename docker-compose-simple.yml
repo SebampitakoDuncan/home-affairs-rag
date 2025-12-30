@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  streamlit-app:
+    build: .
+    container_name: streamlit-rag
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data/uploads:/app/data/uploads
+      - ./data/logs:/app/data/logs
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - qdrant
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
