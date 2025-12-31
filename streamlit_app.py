@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import json
+import httpx
 
 st.set_page_config(page_title="Home Affairs RAG", page_icon="🏠", layout="wide")
 
@@ -73,23 +73,54 @@ if prompt := st.chat_input("Ask your question about Australian visas..."):
         with st.chat_message("assistant"):
             with st.spinner("Searching knowledge base..."):
                 try:
-                    import httpx
+                    # Check Qdrant connection first
+                    headers = {"api-key": qdrant_api_key}
 
                     # Search Qdrant Cloud
                     search_response = httpx.post(
                         f"{qdrant_url}/collections/home_affairs_docs/points/query",
-                        headers={"Authorization": f"Bearer {qdrant_api_key}"},
+                        headers=headers,
                         json={"query": [0.1] * 384, "limit": 3},
                         timeout=30.0,
                     )
 
-                    if search_response.status_code == 200:
+                    if search_response.status_code == 401:
+                        st.error(
+                            "❌ Qdrant API key is wrong. Check your QDRANT_API_KEY in Secrets"
+                        )
+                    elif search_response.status_code == 404:
+                        st.warning(
+                            "Collection 'home_affairs_docs' not found. Creating it..."
+                        )
+                        # Create collection
+                        create_response = httpx.put(
+                            f"{qdrant_url}/collections/home_affairs_docs",
+                            headers=headers,
+                            json={"vectors": {"size": 384, "distance": "Cosine"}},
+                            timeout=30.0,
+                        )
+                        if create_response.status_code in [200, 201]:
+                            st.success(
+                                "✅ Collection created! Add documents to enable search."
+                            )
+                        else:
+                            st.error(
+                                f"Failed to create collection: {create_response.status_code}"
+                            )
+                    elif search_response.status_code == 403:
+                        st.error(
+                            "❌ Qdrant API key is invalid. Please check your QDRANT_API_KEY in Secrets"
+                        )
+                    elif search_response.status_code == 200:
                         results = (
                             search_response.json().get("result", {}).get("points", [])
                         )
 
                         if not results:
                             st.info("No documents found in knowledge base.")
+                            st.info(
+                                "💡 Run `python scripts/populate_db.py` to add test documents"
+                            )
                         else:
                             context_parts = []
                             sources = []
@@ -148,7 +179,9 @@ Answer:"""
                                     f"OpenRouter error: {llm_response.status_code}"
                                 )
                     else:
-                        st.error(f"Qdrant error: {search_response.status_code}")
+                        st.error(
+                            f"Qdrant error: {search_response.status_code} - {search_response.text}"
+                        )
 
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
