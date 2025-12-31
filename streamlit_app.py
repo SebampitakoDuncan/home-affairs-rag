@@ -73,61 +73,36 @@ if prompt := st.chat_input("Ask your question about Australian visas..."):
         with st.chat_message("assistant"):
             with st.spinner("Searching knowledge base..."):
                 try:
-                    # Check Qdrant connection first
                     headers = {"api-key": qdrant_api_key}
+
+                    # Create embedding using FastEmbed
+                    from fastembed import TextEmbedding
+
+                    model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+                    query_vector = list(model.embed([prompt]))[0].tolist()
 
                     # Search Qdrant Cloud
                     search_response = httpx.post(
                         f"{qdrant_url}/collections/home_affairs_docs/points/query",
                         headers=headers,
-                        json={"query": [0.1] * 384, "limit": 3},
+                        json={"query": query_vector, "limit": 5},
                         timeout=30.0,
                     )
 
-                    if search_response.status_code == 401:
-                        st.error(
-                            "❌ Qdrant API key is wrong. Check your QDRANT_API_KEY in Secrets"
-                        )
-                    elif search_response.status_code == 404:
-                        st.warning(
-                            "Collection 'home_affairs_docs' not found. Creating it..."
-                        )
-                        # Create collection
-                        create_response = httpx.put(
-                            f"{qdrant_url}/collections/home_affairs_docs",
-                            headers=headers,
-                            json={"vectors": {"size": 384, "distance": "Cosine"}},
-                            timeout=30.0,
-                        )
-                        if create_response.status_code in [200, 201]:
-                            st.success(
-                                "✅ Collection created! Add documents to enable search."
-                            )
-                        else:
-                            st.error(
-                                f"Failed to create collection: {create_response.status_code}"
-                            )
-                    elif search_response.status_code == 403:
-                        st.error(
-                            "❌ Qdrant API key is invalid. Please check your QDRANT_API_KEY in Secrets"
-                        )
-                    elif search_response.status_code == 200:
+                    if search_response.status_code == 200:
                         results = (
                             search_response.json().get("result", {}).get("points", [])
                         )
 
                         if not results:
-                            st.info("No documents found in knowledge base.")
-                            st.info(
-                                "💡 Run `python scripts/populate_db.py` to add test documents"
-                            )
+                            st.info("No documents found. Try another question.")
                         else:
                             context_parts = []
                             sources = []
 
                             for idx, point in enumerate(results):
                                 payload = point.get("payload", {})
-                                text = payload.get("text", "")
+                                text = payload.get("text", "")[:1500]
                                 title = payload.get("title", "Unknown")
                                 url = payload.get("url", "")
                                 context_parts.append(f"[{idx + 1}] {title}\n{text}")
@@ -136,14 +111,14 @@ if prompt := st.chat_input("Ask your question about Australian visas..."):
                             context = "\n\n".join(context_parts)
 
                             # Get answer from OpenRouter
-                            rag_prompt = f"""Use these documents to answer the question.
+                            rag_prompt = f"""Use these Home Affairs documents to answer the question.
 
 Documents:
 {context}
 
 Question: {prompt}
 
-Answer:"""
+Provide a clear, accurate answer based on the documents above. Include relevant details about visa requirements, costs, processing times, and eligibility criteria."""
 
                             llm_response = httpx.post(
                                 "https://openrouter.ai/api/v1/chat/completions",
@@ -179,12 +154,10 @@ Answer:"""
                                     f"OpenRouter error: {llm_response.status_code}"
                                 )
                     else:
-                        st.error(
-                            f"Qdrant error: {search_response.status_code} - {search_response.text}"
-                        )
+                        st.error(f"Qdrant error: {search_response.status_code}")
 
                 except Exception as e:
                     st.error(f"Error: {str(e)}")
 
 st.divider()
-st.caption("Powered by Qdrant Cloud + OpenRouter")
+st.caption("Powered by Qdrant Cloud + FastEmbed + OpenRouter")
